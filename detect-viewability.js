@@ -7,10 +7,10 @@
 var DRGAdViewablilityIndicator = ( function() {
 	'use strict';
 
-	var DRGStylesheetReference = document.styleSheets[0];
-	var DRGAdElementStyle = 'position: relative;';
-	var DRGAdBeforePseudoElementStyle = 'content: ""; display: block; height: 100%; width: 100%; position: absolute; z-index: 5000; top: 0; left: 0; background: green; opacity: 0.65;';
-	var DRGAdAfterPsuedoElementStyle = 'content: "Ad Viewable"; display: inline-block; position: absolute; z-index: 5001; top: calc( 50% - 10px ); left: calc(50% - 55px );font-size: 16px; font-weight: bold; text-transform: uppercase; color: #fff; text-shadow: -1px -1px #000; font-family: sans-serif;';
+	var stylesheetReference = document.styleSheets[0];
+	var adElementStyle = 'position: relative;';
+	var adBeforePseudoElementStyle = 'content: ""; display: block; height: 100%; width: 100%; position: absolute; z-index: 5000; top: 0; left: 0; background: green; opacity: 0.65;';
+	var adAfterPsuedoElementStyle = 'content: "Ad Viewable"; display: inline-block; position: absolute; z-index: 5001; top: calc( 50% - 10px ); left: calc(50% - 55px );font-size: 16px; font-weight: bold; text-transform: uppercase; color: #fff; text-shadow: -1px -1px #000; font-family: sans-serif;';
 
 	var googletag = window.googletag || {};
 	googletag.cmd = googletag.cmd || [];
@@ -20,7 +20,7 @@ var DRGAdViewablilityIndicator = ( function() {
 			setTimeout( setupViewableDetection, 20 );
 			return;
 		}
-		googletag.cmd.push( function() {
+		googletag.cmd.unshift( function() {
 			googletag.pubads().addEventListener( 'impressionViewable', function( viewed ) {
 				var slotElementID = viewed.slot.getSlotElementId();
 				console.log( slotElementID + ' slot now considered viewed:' );
@@ -28,31 +28,31 @@ var DRGAdViewablilityIndicator = ( function() {
 				insertStyles( slotElementID );
 			} );
 		} );
-	}
+	};
 
 	var insertStyles = function( elementID ) {
-		DRGStylesheetReference.insertRule(
+		stylesheetReference.insertRule(
 			'#' + elementID + ' { ' +
-			DRGAdElementStyle + '}',
+			adElementStyle + '}',
 			0
 		);
-		DRGStylesheetReference.insertRule(
+		stylesheetReference.insertRule(
 			'#' + elementID + '::before { ' +
-			DRGAdBeforePseudoElementStyle + '}',
+			adBeforePseudoElementStyle + '}',
 			0
 		);
 		if ( document.getElementById( elementID ).offsetHeight > 20 ) {
-			DRGStylesheetReference.insertRule(
+			stylesheetReference.insertRule(
 				'#' + elementID + '::after { ' +
-				DRGAdAfterPsuedoElementStyle + '}',
+				adAfterPsuedoElementStyle + '}',
 				0
 			);
 		}
-	}
+	};
 
 	var init = function() {
 		setupViewableDetection();
-	}
+	};
 
 	return {
 		init: init

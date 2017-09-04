@@ -4,14 +4,20 @@ var DRGAdViewablilityIndicator = ( function() {
 	var adElementStyle = 'position: relative;';
 	var adBeforePseudoElementStyle = 'content: ""; display: block; height: 100%; width: 100%; position: absolute; z-index: 5000; top: 0; left: 0; background: green; opacity: 0.65;';
 	var adAfterPsuedoElementStyle = 'content: "Ad Viewable"; display: inline-block; position: absolute; z-index: 5001; top: calc( 50% - 10px ); left: calc(50% - 55px );font-size: 16px; font-weight: bold; text-transform: uppercase; color: #fff; text-shadow: -1px -1px #000; font-family: sans-serif;';
+	var enableAttempts = 0,
+		maxAttempts = 500,
+		sheet;
 
 	window.googletag = window.googletag || {};
 	window.googletag.cmd = window.googletag.cmd || [];
 
 	var setupViewableDetection = function() {
 		if ( ! window.googletag || ! window.googletag.pubadsReady ) {
-			setTimeout( setupViewableDetection, 20 );
-			return;
+			enableAttempts += 1;
+			if ( enableAttempts <= maxAttempts ) {
+				setTimeout( setupViewableDetection, 20 );
+				return;
+			}
 		}
 
 		var stylesheet = createStylesheet();

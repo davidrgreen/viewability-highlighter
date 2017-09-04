@@ -20,7 +20,7 @@ var DRGAdViewablilityIndicator = ( function() {
 			}
 		}
 
-		var stylesheet = createStylesheet();
+		sheet = createStylesheet();
 
 		window.googletag.cmd.push( function() {
 			window.googletag.pubads().addEventListener( 'impressionViewable', function( viewed ) {
@@ -41,28 +41,29 @@ var DRGAdViewablilityIndicator = ( function() {
 		return style.sheet;
 	};
 
-	var insertStyles = function( elementID, stylesheet ) {
-		stylesheet.insertRule(
+	var insertStyles = function( elementID ) {
+		getSheet().insertRule(
 			'#' + elementID + ' { ' +
-			adElementStyle + '}',
-			0
+			adElementStyle + '}'
 		);
-		stylesheet.insertRule(
+		getSheet().insertRule(
 			'#' + elementID + '::before { ' +
-			adBeforePseudoElementStyle + '}',
-			0
+			adBeforePseudoElementStyle + '}'
 		);
 		if ( document.getElementById( elementID ).offsetHeight > 20 ) {
-			stylesheet.insertRule(
+			getSheet().insertRule(
 				'#' + elementID + '::after { ' +
-				adAfterPsuedoElementStyle + '}',
-				0
+				adAfterPsuedoElementStyle + '}'
 			);
 		}
 	};
 
 	var init = function() {
 		setupViewableDetection();
+	};
+
+	var getSheet = function() {
+		return sheet;
 	};
 
 	return {

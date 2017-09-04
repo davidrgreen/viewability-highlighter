@@ -22,11 +22,31 @@ var DRGAdViewablilityIndicator = ( function() {
 
 		sheet = createStylesheet();
 
-		window.googletag.cmd.push( function() {
-			window.googletag.pubads().addEventListener( 'impressionViewable', function( viewed ) {
-				var slotElementID = viewed.slot.getSlotElementId();
-				insertStyles( slotElementID, stylesheet );
-			} );
+		googletag.cmd.push( function() {
+			googletag.pubads().addEventListener(
+				'impressionViewable',
+				function( viewed ) {
+					var slotElementID = viewed.slot.getSlotElementId();
+					console.log( slotElementID + ' is viewable' );
+					insertStyles( slotElementID );
+				}
+			);
+			googletag.companionAds().addEventListener(
+				'impressionViewable',
+				function( viewed ) {
+					var slotElementID = viewed.slot.getSlotElementId();
+					console.log( slotElementID + ' is viewable' );
+					insertStyles( slotElementID );
+				}
+			);
+			googletag.content().addEventListener(
+				'impressionViewable',
+				function( viewed ) {
+					var slotElementID = viewed.slot.getSlotElementId();
+					console.log( slotElementID + ' is viewable' );
+					insertStyles( slotElementID );
+				}
+			);
 		} );
 	};
 

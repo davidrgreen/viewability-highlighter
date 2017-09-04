@@ -6,7 +6,8 @@ var DRGAdViewablilityIndicator = ( function() {
 	var adAfterPsuedoElementStyle = 'content: "Ad Viewable"; display: inline-block; position: absolute; z-index: 5001; top: calc( 50% - 10px ); left: calc(50% - 55px );font-size: 16px; font-weight: bold; text-transform: uppercase; color: #fff; text-shadow: -1px -1px #000; font-family: sans-serif;';
 	var enableAttempts = 0,
 		maxAttempts = 500,
-		sheet;
+		sheet,
+		insertedStyleCount = 0;
 
 	window.googletag = window.googletag || {};
 	window.googletag.cmd = window.googletag.cmd || [];
@@ -27,24 +28,24 @@ var DRGAdViewablilityIndicator = ( function() {
 				'impressionViewable',
 				function( viewed ) {
 					var slotElementID = viewed.slot.getSlotElementId();
-					console.log( slotElementID + ' is viewable' );
-					insertStyles( slotElementID );
+					console.log( 'Slot ' + slotElementID + ' is viewable' );
+					insertStyles( viewed.slot );
 				}
 			);
 			googletag.companionAds().addEventListener(
 				'impressionViewable',
 				function( viewed ) {
 					var slotElementID = viewed.slot.getSlotElementId();
-					console.log( slotElementID + ' is viewable' );
-					insertStyles( slotElementID );
+					console.log( 'Slot ' + slotElementID + ' is viewable' );
+					insertStyles( viewed.slot );
 				}
 			);
 			googletag.content().addEventListener(
 				'impressionViewable',
 				function( viewed ) {
 					var slotElementID = viewed.slot.getSlotElementId();
-					console.log( slotElementID + ' is viewable' );
-					insertStyles( slotElementID );
+					console.log( 'Slot ' + slotElementID + ' is viewable' );
+					insertStyles( viewed.slot );
 				}
 			);
 		} );
@@ -61,20 +62,54 @@ var DRGAdViewablilityIndicator = ( function() {
 		return style.sheet;
 	};
 
-	var insertStyles = function( elementID ) {
+	var insertStyles = function( slot ) {
+		var slotElementId = slot.getSlotElementId(),
+			element,
+			className,
+			selector,
+			adPath;
+		if ( isValidID( slotElementId ) ) {
+			element = document.getElementById( slotElementId );
+			selector = '#' + slotElementId;
+		} else {
+			// The slot does not have a valid ID that can be recognized by a
+			// CSS style, such as beginning with a number, so need to add
+			// a class to the ad element and target that.
+			adPath = slot.getAdUnitPath();
+			element = document.querySelector( 'div[id*="' + adPath + '"]' );
+			if ( element ) {
+				className = 'DRGViewableAd-' + insertedStyleCount;
+				insertedStyleCount += 1;
+				selector = '.' + className;
+				addClass( element, className );
+			}
+		}
+
 		getSheet().insertRule(
-			'#' + elementID + ' { ' +
+			selector + ' { ' +
 			adElementStyle + '}'
 		);
 		getSheet().insertRule(
-			'#' + elementID + '::before { ' +
+			selector + '::before { ' +
 			adBeforePseudoElementStyle + '}'
 		);
-		if ( document.getElementById( elementID ).offsetHeight > 20 ) {
+		if ( element.offsetHeight > 20 ) {
 			getSheet().insertRule(
-				'#' + elementID + '::after { ' +
+				selector + '::after { ' +
 				adAfterPsuedoElementStyle + '}'
 			);
+		}
+	};
+
+	var isValidID = function( id ) {
+		return id.match( /^[a-z][\w:.-]*$/i );
+	};
+
+	var addClass = function( element, className ) {
+		if ( element.classList ) {
+			element.classList.add( className );
+		} else {
+			element.className += ' ' + className;
 		}
 	};
 
